@@ -69,6 +69,10 @@ use Cake\Routing\RouteBuilder;
             $builder->connect('/tagged/*', ['controller' => 'Articles', 'action' => 'tags']);
         });
 
+        // $builder->scope('/users/view/*', function (RouteBuilder $builder) {
+        //     $builder->connect('/articles/edit*', ['controller' => 'Articles', 'action' => 'edit']);
+        // });
+
         /*
          * Connect catchall routes for all controllers.
          *

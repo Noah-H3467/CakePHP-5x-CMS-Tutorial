@@ -33,7 +33,7 @@
                             ['action' => 'delete', $tag->id],
                             [
                                 'method' => 'delete',
-                                'confirm' => __('Are you sure you want to delete # {0}?', $tag->id),
+                                'confirm' => __('Are you sure you want to delete {0}?', $tag->title),
                             ]
                         ) ?>
                     </td>

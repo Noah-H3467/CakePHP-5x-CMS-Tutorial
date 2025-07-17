@@ -62,14 +62,14 @@
                             <td><?= h($article->created) ?></td>
                             <td><?= h($article->modified) ?></td>
                             <td class="actions">
-                                <?= $this->Html->link(__('View'), ['controller' => 'Articles', 'action' => 'view', $article->id]) ?>
-                                <?= $this->Html->link(__('Edit'), ['controller' => 'Articles', 'action' => 'edit', $article->id]) ?>
+                                <?= $this->Html->link(__('View'), ['controller' => 'Articles', 'action' => 'view', $article->slug]) ?>
+                                <?= $this->Html->link(__('Edit'), ['controller' => 'Articles', 'action' => 'edit', $article->slug]) ?>
                                 <?= $this->Form->postLink(
                                     __('Delete'),
-                                    ['controller' => 'Articles', 'action' => 'delete', $article->id],
+                                    ['controller' => 'Articles', 'action' => 'delete', $article->slug],
                                     [
                                         'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $article->id),
+                                        'confirm' => __('Are you sure you want to delete {0}?', $article->title),
                                     ]
                                 ) ?>
                             </td>

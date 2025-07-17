@@ -59,6 +59,7 @@ class ArticlePolicy
      */
     public function canView(IdentityInterface $user, Article $article)
     {
+        return true;
     }
 
     /**

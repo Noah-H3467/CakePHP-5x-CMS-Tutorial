@@ -17,6 +17,8 @@ class UsersController extends AppController
      */
     public function index()
     {
+        $this->Authorization->skipAuthorization();
+
         $query = $this->Users->find();
         $users = $this->paginate($query);
 
@@ -32,6 +34,8 @@ class UsersController extends AppController
      */
     public function view($id = null)
     {
+        $this->Authorization->skipAuthorization();
+
         $user = $this->Users->get($id, contain: ['Articles']);
         $this->set(compact('user'));
     }
@@ -68,8 +72,13 @@ class UsersController extends AppController
     public function edit($id = null)
     {
         $user = $this->Users->get($id, contain: []);
+        // Authorize
+        $this->Authorization->authorize($user);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $user = $this->Users->patchEntity($user, $this->request->getData(), [
+                // Added: Disable modification of user_id.
+                'accessibleFields' => ['user_id' => false]
+            ]);
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('The user has been saved.'));
 
@@ -91,6 +100,9 @@ class UsersController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $user = $this->Users->get($id);
+        // Authorize
+        $this->Authorization->authorize($user);
+
         if ($this->Users->delete($user)) {
             $this->Flash->success(__('The user has been deleted.'));
         } else {
@@ -117,12 +129,12 @@ class UsersController extends AppController
         // regardless of POST or GET, redirect if user is logged in
         if ($result && $result->isValid()) {
             // redirect to /articles after login success
-            $redirect = $this->request->getQuery('redirect', [
-                'controller' => 'Articles',
-                'action' => 'index',
-            ]);
-
-            return $this->redirect($redirect);
+            // $redirect = $this->request->getQuery('redirect', [
+            //     'controller' => 'Articles',
+            //     'action' => 'index',
+            // ]);
+                // return $this->refirect($redirect);
+            return $this->redirect(['controller' => 'Articles', 'action' => 'index']);
         }
         // display error if user submitted and authentication failed
         if ($this->request->is('post') && !$result->isValid()) {
