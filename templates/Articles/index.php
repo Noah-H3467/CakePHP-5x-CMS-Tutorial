@@ -7,6 +7,7 @@
 <table>
     <tr>
         <th>Title</th>
+        <th>Author ID</th>
         <th>Created</th>
         <th>Action</th>
     </tr>
@@ -17,6 +18,10 @@
     <tr>
         <td>
             <?= $this->Html->link($article->title, ['action' => 'view', $article->slug]) ?>
+        </td>
+        <td>
+            <?= $article->user_id ?>
+
         </td>
         <td>
             <?= $article->created->format(DATE_RFC850) ?>
