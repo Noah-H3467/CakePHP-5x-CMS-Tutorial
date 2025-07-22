@@ -77,7 +77,10 @@ class UsersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData(), [
                 // Added: Disable modification of user_id.
-                'accessibleFields' => ['user_id' => false]
+                'accessibleFields' => ['user_id' => false,
+                    // 7/22/25 Token Authentication - to not show the long hashed string to the client
+                'new_token' => true,
+                'token_active' => true]
             ]);
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('The user has been saved.'));

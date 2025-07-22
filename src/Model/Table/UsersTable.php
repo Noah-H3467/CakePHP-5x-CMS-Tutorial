@@ -7,6 +7,9 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\EventInterface;
+use Cake\Datasource\EntityInterface;
+// use App\Model\Entity\User;
 
 /**
  * Users Model
@@ -50,6 +53,33 @@ class UsersTable extends Table
         $this->hasMany('Articles', [
             'foreignKey' => 'user_id',
         ]);
+    }
+
+    // 7/22/25: with auth plugins
+    public function beforeSave(
+        EventInterface $event, // App\Model\Table\Cake\Event\Event $event, // EventInterface $event,
+        EntityInterface $entity, // User $entity, // 
+        \ArrayObject $options
+    ): void {
+        if ($entity->hasValue('new_password')) {
+            $entity->password = $entity->new_password;
+
+            unset($entity['new_password']);
+        }
+
+        if ($entity->hasValue('new_token')) {
+            if (strlen($entity->new_token) > 0 ) {
+                $entity->token = $entity->new_token;
+                unset($entity['new_token']);
+            }
+        }
+    }
+
+    // 7/22/25: Custom finder so that we can filter down to just those that we want to have token authentication working
+    public function findToken(SelectQuery $query): SelectQuery
+    {
+        return $query->where(['token_active' => true])
+            ->whereNotNull(['token']);
     }
 
     /**
