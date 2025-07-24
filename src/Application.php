@@ -114,15 +114,30 @@ class Application extends BaseApplication
 
             // Cross Site Request Forgery (CSRF) Protection Middleware
             // https://book.cakephp.org/4/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            ->add(new CsrfProtectionMiddleware([
-                'httponly' => true,
-            ]))
+            //->add(new CsrfProtectionMiddleware([
+            //    'httponly' => true,
+            //]))
             
             // Add the AuthenticationMiddleware. It should be after routing and body parser.
             ->add(new AuthenticationMiddleware($this))
             
             // Add authorization **after** authentication
             ->add(new AuthorizationMiddleware($this));
+
+        $csrf = new CsrfProtectionMiddleware(
+            // ['httponly' => true,]
+        );
+
+        // Token check will be skipped when callback returns `true`.
+        $csrf->skipCheckCallback(function ($request) {
+            // Skip token check for API URLs.
+            if ($request->getParam('prefix') === 'Api') {
+                return true;
+            }
+        });
+
+        // Ensure routing middleware is added to the queue before CSRF protection middleware.
+        $middlewareQueue->add($csrf);
 
         return $middlewareQueue;
     }
