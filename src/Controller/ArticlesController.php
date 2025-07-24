@@ -30,7 +30,8 @@ class ArticlesController extends AppController
     public function add()
     {
         $article = $this->Articles->newEmptyEntity();
-        $this->Authorization->authorize($article);
+        //$this->Authorization->authorize($article);
+        $this->Authorization->skipAuthorization();
 
         if ($this->request->is('post')) {
             $article = $this->Articles->patchEntity($article, $this->request->getData());

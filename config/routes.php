@@ -49,6 +49,60 @@ use Cake\Routing\RouteBuilder;
      */
     $routes->setRouteClass(DashedRoute::class);
 
+    // in config/routes.php
+    $routes->scope('/api', function (RouteBuilder $routes): void {
+        $routes->setExtensions(['json', 'xml']);
+        $routes->resources('Articles', ['prefix' => 'Api']);
+        $routes->resources('Users', ['prefix' => 'Api']);
+        $routes->resources('Tags', ['prefix' => 'Api']);
+    });
+
+    $routes->scope('/api', function (RouteBuilder $routes) {
+
+        // ARTICLES
+        // Route for GET requests to /articles/view{id}
+        $routes->get('/articles/view/{id}', ['controller' => 'Articles', 'action' => 'view'])
+            ->setPatterns(['id' => '[0-9]+']); // Define ID as a numeric pattern
+
+        // Route for POST requests to /articles/add
+        $routes->post('/articles/add', ['controller' => 'Articles', 'action' => 'add']); 
+
+        // Route for PUT requests to /articles/edit/{id}
+        $routes->put('/articles/edit/{id}', ['controller' => 'Articles', 'action' => 'edit'])
+            ->setPatterns(['id' => '[0-9]+']); // Define ID as a numeric pattern
+
+        // Route for DELETE requests to /articles/delete/{id}
+        $routes->delete('/articles/delete/{id}', ['controller' => 'Articles', 'action' => 'delete'])
+            ->setPatterns(['id' => '[0-9]+']); // Define ID as a numeric pattern
+
+        // USERS
+        // Route for GET requests to /users/view
+        $routes->get('/users/view/{id}', ['controller' => 'Users', 'action' => 'view'])
+            ->setPatterns(['id' => '[0-9]+']);
+
+        // Route for POST requests to /users/add
+        $routes->post('/users/add', ['controller' => 'Users', 'action' => 'add']); 
+
+        // Route for PUT requests to /users/edit/{user_id}
+        $routes->put('/users/edit/{user_id}', ['controller' => 'Users', 'action' => 'edit'])
+            ->setPatterns(['user_id' => '[0-9]+']);
+
+        $routes->delete('/users/delete/{id}', ['controller' => 'Users', 'action' => 'delete'])
+            ->setPatterns(['id' => '[0-9]+']);
+
+        // TAGS
+        $routes->get('/tags/view/{id}', ['controller' => 'Tags', 'action' => 'view'])
+            ->setPatterns(['id' => '[0-9]+']);
+        
+        $routes->post('/tags/add', ['controller' => 'Tags', 'action' => 'add']); 
+    
+        $routes->put('/tags/edit/{id}', ['controller' => 'Tags', 'action' => 'edit'])
+            ->setPatterns(['id' => '[0-9]+']);
+
+        $routes->delete('/tags/delete/{id}', ['controller' => 'Tags', 'action' => 'delete'])
+            ->setPatterns(['id' => '[0-9]+']);
+    });
+
     $routes->scope('/', function (RouteBuilder $builder) {
         /*
          * Here, we are connecting '/' (base path) to a controller called 'Pages',
@@ -89,6 +143,13 @@ use Cake\Routing\RouteBuilder;
         $builder->fallbacks();
     });
 
+
+    
+    // in config/routes.php
+// $routes->scope('/', function (RouteBuilder $routes): void {
+//     $routes->setExtensions(['json']);
+//     $routes->resources('Recipes');
+// });
     /*
      * If you need a different set of middleware or none at all,
      * open new scope and define routes there.
