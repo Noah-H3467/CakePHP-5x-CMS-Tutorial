@@ -40,6 +40,8 @@ use Authorization\AuthorizationServiceInterface;
 use Authorization\AuthorizationServiceProviderInterface;
 use Authorization\Middleware\AuthorizationMiddleware;
 use Authorization\Policy\OrmResolver;
+// 7/22/25: ServerResuest import
+use Cake\Http\ServerRequest;
 
 /**
  * Application setup class.
@@ -111,27 +113,27 @@ class Application extends BaseApplication
             // available as array through $request->getData()
             // https://book.cakephp.org/4/en/controllers/middleware.html#body-parser-middleware
             ->add(new BodyParserMiddleware())
-
-            // Cross Site Request Forgery (CSRF) Protection Middleware
-            // https://book.cakephp.org/4/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            //->add(new CsrfProtectionMiddleware([
-            //    'httponly' => true,
-            //]))
             
             // Add the AuthenticationMiddleware. It should be after routing and body parser.
             ->add(new AuthenticationMiddleware($this))
             
             // Add authorization **after** authentication
             ->add(new AuthorizationMiddleware($this));
-
+      
+        // Cross Site Request Forgery (CSRF) Protection Middleware
+        // https://book.cakephp.org/4/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
         $csrf = new CsrfProtectionMiddleware(
             // ['httponly' => true,]
         );
-
+      
         // Token check will be skipped when callback returns `true`.
-        $csrf->skipCheckCallback(function ($request) {
-            // Skip token check for API URLs.
-            if ($request->getParam('prefix') === 'Api') {
+        $csrf->skipCheckCallback(function (ServerRequest $request) {
+            // 7/22/25: Skipping CSRF checks for specific actions - ajax
+            if ($request->getParam('action') === 'ajax' 
+                && $request->getHeaderLine('X-My-Custom-Header') === 'hijames') {
+                return true;
+            } else if ($request->getParam('prefix') === 'Api') {
+                // Skip token check for API URLs.
                 return true;
             }
         });
@@ -176,25 +178,48 @@ class Application extends BaseApplication
             'queryParam' => 'redirect',
         ]);
 
-        // Load identifiers, ensure we check email and password fields
-        $authenticationService->loadIdentifier('Authentication.Password', [
-            'fields' => [
-                'username' => 'email',
-                'password' => 'password',
-            ],
-        ]);
+        // 7/22/25 Token authentication
+        /** 
+         * @var \Cake\Http\ServerRequest $request
+         */
+        if($request->is('ajax')) {
+            $authenticationService->loadIdentifier('Authentication.Token', [
+                'datafield' => 'token',
+                'tokenField' => 'token',
+                'resolver' => [
+                    'className' => 'Authentication.Orm',
+                    'userModel' => 'Users',
+                    'finder'=> 'token', // default: 'all 
+                    // for toggling on the token active field in the database. only select users that have the active token
+                ],
+                'hashAlgorithm' => 'sha256'
+            ]);
+            // Getting a token from a header, or query string
+            $authenticationService->loadAuthenticator('Authentication.Token', [
+                'queryParam' => 'token',
+                'header' => 'Authorization',
+                'tokenPrefix' => 'Token'
+            ]);
+        } else {
+            // Load identifiers, ensure we check email and password fields
+            $authenticationService->loadIdentifier('Authentication.Password', [
+                'fields' => [
+                    'username' => 'email',
+                    'password' => 'password',
+                ],
+            ]);
 
-        // Load the authenticators, you want session first
-        $authenticationService->loadAuthenticator('Authentication.Session');
-        // Configure form data check to pick email and password
-        $authenticationService->loadAuthenticator('Authentication.Form', [
-            'fields' => [
-                'username' => 'email',
-                'password' => 'password',
-            ],
-            'loginUrl' => Router::url('/users/login'),
-        ]);
-
+            // Load the authenticators, you want session first
+            $authenticationService->loadAuthenticator('Authentication.Session');
+            // Configure form data check to pick email and password
+            $authenticationService->loadAuthenticator('Authentication.Form', [
+                'fields' => [
+                    'username' => 'email',
+                    'password' => 'password',
+                ],
+                'loginUrl' => Router::url('/users/login'),
+            ]);
+        } 
         return $authenticationService;
     }
 

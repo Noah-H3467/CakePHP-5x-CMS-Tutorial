@@ -87,6 +87,8 @@ class ArticlesController extends AppController
             $this->Flash->success(__('The {0} article has been deleted.', $article->title));
 
             return $this->redirect(['action' => 'index']);
+        } else {
+            $this->Flash->error(_('This article could not be deleted. Please try again.'));
         }
     }
 
@@ -103,5 +105,28 @@ class ArticlesController extends AppController
             'articles' => $articles,
             'tags' => $tags
         ]);
+    }
+
+    public function ajax() 
+    {
+        // No authorization needed here
+        $this->Authorization->skipAuthorization();
+        if($this->request->is('ajax')) {
+            //Send back email address and method it was called with
+            $data = [
+                'email' => $this->getRequest()
+                    ->getAttribute('identity')
+                    ->getOriginalData()['email'],
+                'method' => $this->request->getMethod(),
+            ];
+
+            // Provide information back to an Ajax client
+            $this->viewBuilder()
+                ->setClassName('Json')
+                ->setOption('serialize', 'data');
+
+            //Send the data back
+            $this->set(compact('data'));
+        }
     }
 }
