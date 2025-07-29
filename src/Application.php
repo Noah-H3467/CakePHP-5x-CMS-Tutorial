@@ -123,12 +123,12 @@ class Application extends BaseApplication
         // Cross Site Request Forgery (CSRF) Protection Middleware
         // https://book.cakephp.org/4/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
 
-        // 7/22/25: Skipping CSRF checks for specific actions - ajax
         $csrf = new CsrfProtectionMiddleware(['httponly' => true]);
 
         // Token check will be skipped when callback returns `true`.
         $csrf->skipCheckCallback(function (ServerRequest $request) {
             // Skip token check for API URLs.
+            // 7/22/25: Skipping CSRF checks for specific actions - ajax
             if ($request->getParam('action') === 'ajax' 
                 && $request->getHeaderLine('X-My-Custom-Header') === 'hijames') {
                 return true;

@@ -1,3 +1,4 @@
+// See https://www.youtube.com/watch?v=P7OkdNx3JZg
 function assign(data) {
     document.getElementById('email').innerText = data.email
     document.getElementById('method').innerText = data.method
@@ -27,6 +28,8 @@ async function get() {
     console.log(data);
 }
 
+// See curlSend.sh for the request. To store it in an html file, run this in the shell: ./curlSend.sh > out.html
+// You'll need to make sure that the token, the request-with, and the `X-My-Custom-Header' === 'hijames' 
 async function post() {
     const res = await fetch('/articles/ajax?method=post', {
         method: 'post',

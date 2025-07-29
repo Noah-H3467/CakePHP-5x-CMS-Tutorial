@@ -50,3 +50,7 @@ nbproject/*
 # yarn
 yarn-debug.log
 yarn-error.log
+
+# Database file #
+#################
+test_myapp

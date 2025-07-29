@@ -57,8 +57,8 @@ class UsersTable extends Table
 
     // 7/22/25: with auth plugins
     public function beforeSave(
-        EventInterface $event, // App\Model\Table\Cake\Event\Event $event, // EventInterface $event,
-        EntityInterface $entity, // User $entity, // 
+        EventInterface $event,
+        EntityInterface $entity,
         \ArrayObject $options
     ): void {
         if ($entity->hasValue('new_password')) {
