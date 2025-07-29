@@ -36,7 +36,7 @@ class ArticlesController extends AppController
 
         $this->request->allowMethod(['post']); // 'put'
         $article = $this->Articles->newEntity($this->request->getData());
-        if ($this->Articles->save($articles)) {
+        if ($this->Articles->save($article)) {
             $message = 'Saved';
         } else {
             $message = 'Error';
